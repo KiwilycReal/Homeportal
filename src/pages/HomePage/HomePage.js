@@ -1,38 +1,37 @@
-
 import styles from './HomePage.module.css';
-import { useState } from 'react';
+
 import Grid from '@mui/material/Grid'
-import MainNavBar from '../../components/MainNavBar/MainNavBar';
-import BottomBanner from '../../components/MainNavBar/BottomBanner/BottomBanner';
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent';
 
 const HomePage = () => {
 
-    const openedDrawerWidth = '239px';
-    const closedDrawerWidth = '62px';
-    const [isDrawerOpened, setIsDrawerOpened] = useState(false);
-
-    const onDrawerChange = () => {
-        setIsDrawerOpened(!isDrawerOpened)
-    }
-
     return <>
-        <MainNavBar isDrawerOpened={isDrawerOpened}
-            onDrawerChangeHandler={onDrawerChange}
-            openedDrawerWidth={openedDrawerWidth}
-            closedDrawerWidth={closedDrawerWidth}
-        />
-        <Grid
-            sx={{
-            height: '3000px',
-            zIndex: theme => theme.zIndex.drawer + 1,
-            marginTop: theme => theme.mixins.toolbar["@media (min-width:600px)"].minHeight + 'px',
-            transition: 'margin 1s',
-            transitionTimingFunction: 'ease',
-            marginLeft: isDrawerOpened ? openedDrawerWidth : closedDrawerWidth
-        }}>
-            <h1>teste</h1>
+        <Grid container item justifyContent="flex-start">
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <h2>This is for gallery</h2>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <h2>This is for to-do list</h2>
+                    </CardContent>
+                </Card>
+            </Grid>
         </Grid>
-        <BottomBanner/>
+        <Grid container item justifyContent="center">
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <h2>This is for account chart</h2>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
     </>
 };
 

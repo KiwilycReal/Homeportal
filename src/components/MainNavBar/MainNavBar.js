@@ -1,3 +1,5 @@
+import styles from './MainNavBar.module.css';
+
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
@@ -14,27 +16,38 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import AdbIcon from '@mui/icons-material/Adb';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import HomeIcon from '@mui/icons-material/Home';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import EventIcon from '@mui/icons-material/Event';
 
-import styles from './MainNavBar.module.css';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const MainNavBar = (props) => {
     
+    const [selectedItemIndex, setSelectedItemIndex] = useState(0);
     const menuItemObj = {
-        'Gallery': <PhotoLibraryIcon />,
-        'Account Books': <LocalAtmIcon />,
-        'Dummy1': <AdbIcon />,
-        'Dummy2': <AdbIcon />,
-        'Dummy3': <AdbIcon />,
-        'Dummy4': <AdbIcon />
-    }
+        'Home': [<HomeIcon />, '/home'],
+        'Gallery': [<PhotoLibraryIcon />, '/gallery'],
+        'Account Books': [<LocalAtmIcon />, '/account-book'],
+        'To-do List': [<FormatListNumberedIcon />, '/todo'],
+        'Chronology': [<TimelineIcon />, '/chronology'],
+        'Calendar': [<EventIcon />, '/calendar']
+    };
+
+
+    const onMenuItemSelectHandler = (index) => {
+        if (index === selectedItemIndex) return;
+        setSelectedItemIndex(index);
+    };
 
     return <>
         <AppBar component='div' position='fixed'
             sx={{ 
                 zIndex: theme => theme.zIndex.drawer + 1,
-                transition: 'width 1s',
+                transition: 'width 300ms',
                 transitionTimingFunction: 'ease',
                 ...(props.isDrawerOpened && {
                     marginLeft: props.openedDrawerWidth,
@@ -43,32 +56,28 @@ const MainNavBar = (props) => {
             }}
         >
             <Toolbar sx={{
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                paddingLeft: '8px !important'
             }}>
                 <Box sx={{
                     display: 'flex',
-                    'align-items': 'center',
+                    alignItems: 'center'
                 }}>
-                    <IconButton edge="start"
-                        onClick={props.onDrawerChangeHandler}
-                    >
+                    {!props.isDrawerOpened && <IconButton onClick={props.onDrawerChangeHandler}>
                         <MenuIcon />
-                    </IconButton>
+                    </IconButton>}
                     <Typography
                         variant="h5"
-                        sx={{margin: '0 0 0 1rem'}}
+                        sx={{margin: '0 0 0 8px'}}
                     >
-                        HOMEPORTAL ｜ 家庭中枢
+                        HOMEPORTAL
                     </Typography>
                 </Box>
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'flex-end'
                 }}>
-                    <IconButton
-                        edge="end"
-                        color="inherit"
-                    >
+                    <IconButton color="inherit">
                         <AccountCircleIcon />
                         Login
                     </IconButton>
@@ -81,31 +90,46 @@ const MainNavBar = (props) => {
             sx={{
                 '& .MuiDrawer-paper': {
                     width: props.isDrawerOpened ? props.openedDrawerWidth : props.closedDrawerWidth,
-                    transition: 'width 1s',
+                    transition: 'width 300ms',
                     transitionTimingFunction: 'ease'
                 },
             }}
         >
-            <Toolbar>
-                <IconButton edge="end">
-                    <ChevronLeftIcon />
+            <Toolbar sx={{
+                bgcolor: theme => theme.palette.primary.main,
+                justifyContent: 'flex-end',
+                paddingRight: '0 !important'
+            }}>
+                <IconButton size="large"
+                onClick={props.onDrawerChangeHandler}
+                >
+                    <ChevronLeftIcon fontSize="inherit" />
                 </IconButton>
             </Toolbar>
             <List sx={{
                 overflowX: 'hidden',
-                // marginTop: theme => theme.mixins.toolbar["@media (min-width:600px)"].minHeight + 'px'
+                '& a': {
+                    color: 'inherit',
+                    textDecoration: 'none'
+                }
             }}>
                 {Object.keys(menuItemObj).map((label, index) => 
-                    <ListItem key={label}
-                        sx={{padding: '8px 4px'}}
-                    >
-                        <ListItemButton>
-                            <ListItemIcon>
-                                {menuItemObj[label]}
-                            </ListItemIcon>
-                            <ListItemText primary={label} />
-                        </ListItemButton>
-                    </ListItem>
+                    <Link to={menuItemObj[label][1]}>
+                        <ListItem key={label}
+                            sx={{
+                                padding: '8px 0',
+                                whiteSpace: 'nowrap'
+                        }}>
+                            <ListItemButton selected={index === selectedItemIndex}
+                                onClick={()=>onMenuItemSelectHandler(index)}
+                            >
+                                <ListItemIcon>
+                                    {menuItemObj[label][0]}
+                                </ListItemIcon>
+                                    <ListItemText primary={label} />
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 )}
             </List>
         </Drawer>
