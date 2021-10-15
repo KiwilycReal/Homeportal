@@ -63,7 +63,7 @@ const MainNavBar = (props) => {
                     display: 'flex',
                     alignItems: 'center'
                 }}>
-                    {!props.isDrawerOpened && <IconButton onClick={props.onDrawerChangeHandler}>
+                    {!props.isDrawerOpened && <IconButton onClick={props.onDrawerChange}>
                         <MenuIcon />
                     </IconButton>}
                     <Typography
@@ -101,7 +101,7 @@ const MainNavBar = (props) => {
                 paddingRight: '0 !important'
             }}>
                 <IconButton size="large"
-                onClick={props.onDrawerChangeHandler}
+                onClick={props.onDrawerChange}
                 >
                     <ChevronLeftIcon fontSize="inherit" />
                 </IconButton>
@@ -114,11 +114,12 @@ const MainNavBar = (props) => {
                 }
             }}>
                 {Object.keys(menuItemObj).map((label, index) => 
-                    <Link to={menuItemObj[label][1]}>
-                        <ListItem key={label}
-                            sx={{
-                                padding: '8px 0',
-                                whiteSpace: 'nowrap'
+                    <Link to={menuItemObj[label][1]}
+                        key={label}
+                    >
+                        <ListItem  sx={{
+                            padding: '8px 0',
+                            whiteSpace: 'nowrap'
                         }}>
                             <ListItemButton selected={index === selectedItemIndex}
                                 onClick={()=>onMenuItemSelectHandler(index)}

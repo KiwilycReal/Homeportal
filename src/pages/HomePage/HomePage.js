@@ -7,7 +7,7 @@ import CardContent from '@mui/material/CardContent';
 const HomePage = () => {
 
     return <>
-        <Grid container item justifyContent="flex-start">
+        <Grid container item justifyContent="space-evenly">
             <Grid item>
                 <Card>
                     <CardContent>
@@ -27,7 +27,23 @@ const HomePage = () => {
             <Grid item>
                 <Card>
                     <CardContent>
-                        <h2>This is for account chart</h2>
+                        <h2>This is for timeline</h2>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+        <Grid container item justifyContent="space-evenly">
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <h2>This is for accountbook</h2>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid item>
+                <Card>
+                    <CardContent>
+                        <h2>This is for calendar</h2>
                     </CardContent>
                 </Card>
             </Grid>
