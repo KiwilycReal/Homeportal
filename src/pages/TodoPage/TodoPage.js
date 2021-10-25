@@ -13,10 +13,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
@@ -126,24 +128,38 @@ const TodoPage = () => {
     }
 
     return <Grid container item
-        spacing={4}
+        spacing={2}
     >
         <Grid item>
             <h1>TODO List</h1>
         </Grid>
 
         <Grid container item
-            justifyContent='space-between'
-            alignItems='center'
+            spacing={2}
+            sx={{
+                paddingTop: '8px',
+                justifyContent: {
+                    xs: 'flex-start',
+                    sm: 'space-between'
+                },
+                alignItems: 'center'
+            }}
         >
-            <Grid item>
-                <TextField label="Search"
-                    variant="standard" />
-            </Grid>
             <Grid item>
                 <Button variant="contained" onClick={createItem}>
                     Add one!
                 </Button>
+            </Grid>
+            <Grid item>
+                <TextField label="Search"
+                    variant="standard"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position='start'>
+                                <ManageSearchIcon />
+                            </InputAdornment>
+                        )
+                    }} />
             </Grid>
         </Grid>
 
@@ -162,7 +178,16 @@ const TodoPage = () => {
                             justifyContent: 'space-between'
                         }
                     }}>
-                        <Typography variant='h4'>{item.title}</Typography>
+                        <Typography variant='h5'
+                            sx={{
+                                maxWidth: {
+                                    xs: '60%',
+                                    sm: '80%'
+                                }
+                            }}
+                        >
+                            <b>{item.title}</b>
+                        </Typography>
                         <Box>
                             <IconButton size='large'
                                 onClick={(e)=>onItemStatusChangeHandler(e, index, 'isChecked')}
