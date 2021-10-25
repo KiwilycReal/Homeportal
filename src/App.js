@@ -36,7 +36,7 @@ function App() {
             padding: '16px',
             zIndex: theme => theme.zIndex.drawer + 1,
             marginTop: theme => theme.mixins.toolbar["@media (min-width:600px)"].minHeight + 'px',
-            transition: 'margin 300ms',
+            transition: 'margin 300ms, width 300ms',
             transitionTimingFunction: 'ease',
             marginLeft: isDrawerOpened ? openedDrawerWidth : closedDrawerWidth
     }}>
