@@ -25,9 +25,13 @@ import EventIcon from '@mui/icons-material/Event';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import AuthenticationDialog from '../AuthenticationDialog/AuthenticationDialog';
+
 const MainNavBar = (props) => {
     
     const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+    const [isAuthDialogOpened, setIsAuthDialogOpened] = useState(false);
+
     const menuItemObj = {
         'Home': [<HomeIcon />, '/home'],
         'Gallery': [<PhotoLibraryIcon />, '/gallery'],
@@ -42,6 +46,10 @@ const MainNavBar = (props) => {
         if (index === selectedItemIndex) return;
         setSelectedItemIndex(index);
     };
+
+    const onAuthDialogChangeHandler = () => {
+        setIsAuthDialogOpened(!isAuthDialogOpened)
+    }
 
     return <>
         <AppBar component='div' position='fixed'
@@ -77,7 +85,9 @@ const MainNavBar = (props) => {
                     display: 'flex',
                     justifyContent: 'flex-end'
                 }}>
-                    <IconButton color="inherit">
+                    <IconButton color="inherit"
+                        onClick={onAuthDialogChangeHandler}
+                    >
                         <AccountCircleIcon />
                         Login
                     </IconButton>
@@ -134,6 +144,9 @@ const MainNavBar = (props) => {
                 )}
             </List>
         </Drawer>
+        <AuthenticationDialog isAuthDialogOpened={isAuthDialogOpened}
+            onAuthDialogChange={onAuthDialogChangeHandler}
+        />
     </>
 };
 
