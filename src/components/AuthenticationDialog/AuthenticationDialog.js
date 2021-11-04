@@ -5,7 +5,6 @@ import { Alert, AlertTitle, Backdrop, Button, CircularProgress, Grid, IconButton
 import { InputAdornment } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import CloseIcon from '@mui/icons-material/Close';
 
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -27,8 +26,6 @@ const AuthenticationDialog = (props) => {
     });
 
     useEffect(reset,[reset, props.isAuthDialogOpened])
-
-    var lastSetTimeout = null;
 
     const submitAuthData = data => {
         setIsLoading(true);
@@ -74,24 +71,33 @@ const AuthenticationDialog = (props) => {
         setIsPasswordVisible(!isPasswordVisible);
     }
 
-    
+    const getUsernameErrorMsg = () => {
+        if(!errors.username) return '';
 
-    const checkDuplicateUsername = () => new Promise((resolve, reject) => {
-        let username = getValues('username');
-        clearTimeout(lastSetTimeout);
-        lastSetTimeout = setTimeout(() => {
-            axios.get(
-                '/api/auth',
-                {
-                    params: {
-                        username: username
-                    }
-                }
-            ).then(r => resolve(r.data)).catch(e => reject(e));
-        }, 2500)
-    });
-    
+        switch(errors.username.type){
+            case 'required': return 'This field cannot be empty!';
+            case 'minLength': return "Username's length must longer than 3";
+        }
+    }
 
+    const getPasswordErrorMsg = () => {
+        if(!errors.password) return '';
+
+        switch(errors.password.type){
+            case 'required': return 'This field cannot be empty!';
+            case 'pattern': return "Password should contain both numbers and letters, with the least length of 8";
+        }
+    }
+
+    const getNameErrorMsg = (error) => {
+        if(!error) return '';
+
+        switch(error.type){
+            case 'required': return 'This field cannot be empty!';
+            case 'pattern': return "Characters other than letter are not allowed";
+        }
+    }
+    
     return <Dialog open={props.isAuthDialogOpened}
             fullWidth={true}
             maxWidth='xs'
@@ -99,12 +105,12 @@ const AuthenticationDialog = (props) => {
         <DialogContent>
             <form>
                 <Grid container
-                    spacing={2}
+                    spacing={1}
                     sx={{
                         justifyContent: 'center',
+                        height: isLogin ? '300px' : '560px',
                         overflow: 'hidden',
-                        height: isLogin ? '350px' : '650px',
-                        transition: 'height .2s'
+                        transition: 'height 0.2s'
                     }}
                 >
                     <Grid container item
@@ -140,14 +146,12 @@ const AuthenticationDialog = (props) => {
                             control={control}
                             rules={{
                                 required: true,
-                                // validate: async () => await checkDuplicateUsername()
+                                minLength: 2,
                             }}
                             render={({field}) => <TextField {...field}
                                 label='Username'
                                 error={!!errors.username}
-                                helperText={errors.username
-                                    ? 'This field cannot be empty.'
-                                    : ''}
+                                helperText={getUsernameErrorMsg()}
                                 fullWidth
                             />}
                         />
@@ -156,15 +160,14 @@ const AuthenticationDialog = (props) => {
                         <Controller name='password'
                             control={control}
                             rules={{
-                                required: true
+                                required: true,
+                                pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])(.{8,})$/
                             }}
                             render={({field}) => <TextField {...field}
                                 label='Password'
                                 type={isPasswordVisible ? 'text' : 'password'}
                                 error={!!errors.password}
-                                helperText={errors.password
-                                    ? 'This field cannot be empty.'
-                                    : ''}
+                                helperText={getPasswordErrorMsg()}
                                 fullWidth
                                 InputProps={{
                                     endAdornment: (
@@ -185,14 +188,15 @@ const AuthenticationDialog = (props) => {
                             <Controller name='passwordC'
                                 control={control}
                                 rules={{
-                                    required: true
+                                    required: true,
+                                    validate: () => getValues('password') === getValues('passwordC')
                                 }}
                                 render={({field}) => <TextField {...field}
                                     label='Confirm Your Password'
-                                    type='text'
+                                    type={isPasswordVisible ? 'text' : 'password'}
                                     error={!!errors.passwordC}
                                     helperText={errors.passwordC
-                                        ? 'This field cannot be empty.'
+                                        ? "Passwords don't match"
                                         : ''}
                                     fullWidth
                                     InputProps={{
@@ -213,14 +217,13 @@ const AuthenticationDialog = (props) => {
                             <Controller name='firstName'
                                 control={control}
                                 rules={{
-                                    required: true
+                                    required: true,
+                                    pattern: /^[A-Za-z ]+$/
                                 }}
                                 render={({field}) => <TextField {...field}
                                     label='First Name'
                                     error={!!errors.firstName}
-                                    helperText={errors.firstName
-                                        ? 'This field cannot be empty.'
-                                        : ''}
+                                    helperText={getNameErrorMsg(errors.firstName)}
                                     fullWidth
                                 />}
                             />
@@ -229,14 +232,13 @@ const AuthenticationDialog = (props) => {
                             <Controller name='lastName'
                                 control={control}
                                 rules={{
-                                    required: true
+                                    required: true,
+                                    pattern: /^[A-Za-z]+$/
                                 }}
                                 render={({field}) => <TextField {...field}
                                     label='Last Name'
                                     error={!!errors.lastName}
-                                    helperText={errors.lastName
-                                        ? 'This field cannot be empty.'
-                                        : ''}
+                                    helperText={getNameErrorMsg(errors.lastName)}
                                     fullWidth
                                 />}
                             />
@@ -294,16 +296,6 @@ const AuthenticationDialog = (props) => {
                     ...hintState,
                     isActive: false
                 })}
-                // action={
-                //     <IconButton color='inherit'
-                //         onClick={()=>setHintState({
-                //             ...hintState,
-                //             isActive: false
-                //         })}
-                //     >
-                //         <CloseIcon />
-                //     </IconButton>
-                // }
             >
                 <AlertTitle>Authentication Error</AlertTitle>
                 {hintState.message}
