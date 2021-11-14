@@ -8,8 +8,10 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import qs from 'qs';
+import { authActions } from '../../store/authSlice';
 
 const AuthenticationDialog = (props) => {
 
@@ -24,6 +26,7 @@ const AuthenticationDialog = (props) => {
         vertical: 'top',
         horizontal: 'center'
     });
+    const dispatch = useDispatch();
 
     useEffect(reset,[reset, props.isAuthDialogOpened])
 
@@ -38,6 +41,7 @@ const AuthenticationDialog = (props) => {
             if(!r.data.username) throw new Error(r.data)
             if(isLogin){
                 localStorage.setItem('username', r.data.username)
+                dispatch(authActions.login())
                 props.onAuthDialogChange();
             }else{
                 setIsLogin(true);

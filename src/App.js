@@ -10,12 +10,18 @@ import MainNavBar from './components/MainNavBar/MainNavBar';
 import BottomBanner from './components/MainNavBar/BottomBanner/BottomBanner';
 import HomePage from './pages/HomePage/HomePage';
 import TodoPage from './pages/TodoPage/TodoPage';
+import AuthenticationDialog from './components/AuthenticationDialog/AuthenticationDialog';
 
 function App() {
 
   const openedDrawerWidth = '200px';
   const closedDrawerWidth = '56px';
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
+  const [isAuthDialogOpened, setIsAuthDialogOpened] = useState(false);
+
+  const onAuthDialogChangeHandler = () => {
+      setIsAuthDialogOpened(!isAuthDialogOpened)
+  }
 
   const onDrawerChangeHandler = () => {
       setIsDrawerOpened(!isDrawerOpened)
@@ -24,6 +30,7 @@ function App() {
   return <>
     <MainNavBar isDrawerOpened={isDrawerOpened}
         onDrawerChange={onDrawerChangeHandler}
+        onAuthDialogChange={onAuthDialogChangeHandler}
         openedDrawerWidth={openedDrawerWidth}
         closedDrawerWidth={closedDrawerWidth}
     />
@@ -53,6 +60,9 @@ function App() {
         </Switch>
     </Grid>
     <BottomBanner/>
+    <AuthenticationDialog isAuthDialogOpened={isAuthDialogOpened}
+        onAuthDialogChange={onAuthDialogChangeHandler}
+    />
   </>
 }
 

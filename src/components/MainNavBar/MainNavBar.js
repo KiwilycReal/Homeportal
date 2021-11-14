@@ -14,6 +14,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -24,13 +25,14 @@ import EventIcon from '@mui/icons-material/Event';
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import AuthenticationDialog from '../AuthenticationDialog/AuthenticationDialog';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../../store/authSlice';
 
 const MainNavBar = (props) => {
     
     const [selectedItemIndex, setSelectedItemIndex] = useState(0);
-    const [isAuthDialogOpened, setIsAuthDialogOpened] = useState(false);
+    const isLogged = useSelector(state => state.auth.isLogged);
+    const dispatch = useDispatch();
 
     const menuItemObj = {
         'Home': [<HomeIcon />, '/home'],
@@ -44,11 +46,13 @@ const MainNavBar = (props) => {
 
     const onMenuItemSelectHandler = (index) => {
         if (index === selectedItemIndex) return;
+        if (!isLogged) props.onAuthDialogChange();
         setSelectedItemIndex(index);
     };
 
-    const onAuthDialogChangeHandler = () => {
-        setIsAuthDialogOpened(!isAuthDialogOpened)
+    const userLogout = () => {
+        localStorage.setItem('username', '');
+        dispatch(authActions.logout());
     }
 
     return <>
@@ -86,10 +90,17 @@ const MainNavBar = (props) => {
                     justifyContent: 'flex-end'
                 }}>
                     <IconButton color="inherit"
-                        onClick={onAuthDialogChangeHandler}
+                        onClick={
+                            isLogged
+                                ? userLogout
+                                : props.onAuthDialogChange
+                        }
                     >
-                        <AccountCircleIcon />
-                        Login
+                        {
+                            isLogged
+                                ? <><LogoutIcon />Log out</>
+                                : <><AccountCircleIcon />Log in</>
+                        }
                     </IconButton>
                 </Box>
             </Toolbar>
@@ -144,9 +155,6 @@ const MainNavBar = (props) => {
                 )}
             </List>
         </Drawer>
-        <AuthenticationDialog isAuthDialogOpened={isAuthDialogOpened}
-            onAuthDialogChange={onAuthDialogChangeHandler}
-        />
     </>
 };
 
