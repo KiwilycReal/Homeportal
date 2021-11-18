@@ -3,7 +3,6 @@ import styles from './MainNavBar.module.css';
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
-import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -27,6 +26,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../store/authSlice';
+import axios from 'axios';
 
 const MainNavBar = (props) => {
     
@@ -50,10 +50,12 @@ const MainNavBar = (props) => {
         setSelectedItemIndex(index);
     };
 
-    const userLogout = () => {
-        localStorage.setItem('username', '');
-        dispatch(authActions.logout());
-    }
+    const userLogout = () => axios.get('/api/logout').then(r => {
+            localStorage.setItem('username', '');
+            dispatch(authActions.logout());
+        }).catch(e => {
+            console.log(e);
+        });
 
     return <>
         <AppBar component='div' position='fixed'
