@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import { Alert, AlertTitle, Backdrop, Button, CircularProgress, Grid, IconButton, Snackbar, TextField } from '@mui/material';
+import { Backdrop, Button, CircularProgress, Grid, IconButton, Snackbar, TextField } from '@mui/material';
 import { InputAdornment } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import qs from 'qs';
 import { authActions } from '../../store/authSlice';
+import { snackbarActions } from '../../store/snackbarSlice';
 
 const AuthenticationDialog = (props) => {
 
@@ -19,13 +20,6 @@ const AuthenticationDialog = (props) => {
     const [ isLogin, setIsLogin ] = useState(false);
     const [ isPasswordVisible, setIsPasswordVisible ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
-    const [ hintState, setHintState ] = useState({
-        isActive: false,
-        message: '',
-        autoHideDuration: 6000,
-        vertical: 'top',
-        horizontal: 'center'
-    });
     const dispatch = useDispatch();
 
     useEffect(reset,[reset, props.isAuthDialogOpened])
@@ -48,11 +42,15 @@ const AuthenticationDialog = (props) => {
             }
         }).catch( e => {
             console.log(e);
-            setHintState({
-                ...hintState,
-                isActive: true,
-                message: e.message
-            })
+            // setHintState({
+            //     ...hintState,
+            //     isActive: true,
+            //     message: e.message
+            // })
+            dispatch(snackbarActions.showMessage({
+                message: e.message,
+                title: 'Authentication Error'
+            }))
         }).finally(() => setIsLoading(false));
     }
 
@@ -283,28 +281,7 @@ const AuthenticationDialog = (props) => {
             <CircularProgress />
         </Backdrop>
 
-        <Snackbar open={hintState.isActive}
-            autoHideDuration={hintState.autoHideDuration}
-            anchorOrigin={{
-                vertical: hintState.vertical,
-                horizontal: hintState.horizontal
-            }}
-            onClose={() => setHintState({
-                ...hintState,
-                isActive: false
-            })}
-            
-        >
-            <Alert severity='error'
-                onClose={() => setHintState({
-                    ...hintState,
-                    isActive: false
-                })}
-            >
-                <AlertTitle>Authentication Error</AlertTitle>
-                {hintState.message}
-            </Alert>
-        </Snackbar>
+        
     </Dialog>
 };
 
