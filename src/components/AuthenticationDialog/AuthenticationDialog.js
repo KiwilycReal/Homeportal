@@ -36,22 +36,27 @@ const AuthenticationDialog = (props) => {
             if(isLogin){
                 localStorage.setItem('username', r.data.username)
                 dispatch(authActions.login())
+                dispatch(snackbarActions.showMessage({
+                    message: `You are logged in as ${r.data.username}`,
+                    title: 'Login success!',
+                    alertSeverity: 'success'
+                }))
                 props.onAuthDialogChange();
             }else{
+                dispatch(snackbarActions.showMessage({
+                    message: `You can now login with your username & password`,
+                    title: 'Register success!',
+                    alertSeverity: 'success'
+                }));
                 setIsLogin(true);
             }
-        }).catch( e => {
-            console.log(e);
-            // setHintState({
-            //     ...hintState,
-            //     isActive: true,
-            //     message: e.message
-            // })
-            dispatch(snackbarActions.showMessage({
+        }).catch( 
+            e => dispatch(snackbarActions.showMessage({
                 message: e.message,
-                title: 'Authentication Error'
+                title: 'Authentication Error',
+                alertSeverity: 'error'
             }))
-        }).finally(() => setIsLoading(false));
+        ).finally(() => setIsLoading(false));
     }
 
     const sendRegisterRequest = data => axios.post(

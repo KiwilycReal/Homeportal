@@ -27,6 +27,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../store/authSlice';
 import axios from 'axios';
+import { snackbarActions } from '../../store/snackbarSlice';
 
 const MainNavBar = (props) => {
     
@@ -53,9 +54,18 @@ const MainNavBar = (props) => {
     const userLogout = () => axios.get('/api/logout').then(r => {
             localStorage.setItem('username', '');
             dispatch(authActions.logout());
-        }).catch(e => {
-            console.log(e);
-        });
+            dispatch(snackbarActions.showMessage({
+                message: 'You have logged out, login to access the full website',
+                title: 'Log out success!',
+                alertSeverity: 'success'
+            }));
+        }).catch(
+            e => dispatch(snackbarActions.showMessage({
+                message: e.response.data + '\n' + e.response.statusText,
+                title: 'Error occurs when trying to logout',
+                alertSeverity: 'error'
+            }))
+        );
 
     return <>
         <AppBar component='div' position='fixed'
