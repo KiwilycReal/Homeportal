@@ -26,13 +26,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../store/authSlice';
-import axios from 'axios';
 import { snackbarActions } from '../../store/snackbarSlice';
+import useAxios from '../../hooks/useAxios';
 
 const MainNavBar = (props) => {
     
     const [selectedItemIndex, setSelectedItemIndex] = useState(0);
     const isLogged = useSelector(state => state.auth.isLogged);
+    const sendRequest = useAxios();
     const dispatch = useDispatch();
 
     const menuItemObj = {
@@ -51,21 +52,28 @@ const MainNavBar = (props) => {
         setSelectedItemIndex(index);
     };
 
-    const userLogout = () => axios.get('/api/logout').then(r => {
+    const userLogout = () => {
+        let successHandler = (response) => {
+            console.log('Logout successfully', response.data);
             localStorage.setItem('username', '');
             dispatch(authActions.logout());
             dispatch(snackbarActions.showMessage({
                 message: 'You have logged out, login to access the full website',
-                title: 'Log out success!',
+                title: 'Log out successfully!',
                 alertSeverity: 'success'
             }));
-        }).catch(
-            e => dispatch(snackbarActions.showMessage({
-                message: e.response.data + '\n' + e.response.statusText,
-                title: 'Error occurs when trying to logout',
-                alertSeverity: 'error'
-            }))
-        );
+        };
+        let errorHandler = (error) => dispatch(snackbarActions.showMessage({
+            message: error.response.data + '; ' + error.response.statusText,
+            title: "Error occurs when trying to logout!",
+            alertSeverity: 'error'
+        }));
+
+        sendRequest({
+            url: '/api/logout',
+            method: 'get'
+        }, successHandler, errorHandler);
+    }
 
     return <>
         <AppBar component='div' position='fixed'

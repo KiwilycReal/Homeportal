@@ -35,6 +35,7 @@ const AuthenticationDialog = (props) => {
             if(!r.data.username) throw new Error(r.data)
             if(isLogin){
                 localStorage.setItem('username', r.data.username)
+                localStorage.setItem('loginTimestamp', + new Date())
                 dispatch(authActions.login())
                 dispatch(snackbarActions.showMessage({
                     message: `You are logged in as ${r.data.username}`,
@@ -59,6 +60,9 @@ const AuthenticationDialog = (props) => {
         ).finally(() => setIsLoading(false));
     }
 
+    // Below two methods don't need to use the useAxios hook to handle
+    // HTTP 401 unauthorized error due to the back-end server is configured
+    // to allow any incoming request to the register and login url.
     const sendRegisterRequest = data => axios.post(
         '/api/register',
         data

@@ -26,11 +26,11 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import axios from 'axios';
 import HightlightText from '../../components/utilities/HighlightText';
-import useTodoItemList from './useTodoItemList';
+import useTodoItemList from '../../hooks/useTodoItemList';
 import { useDispatch } from 'react-redux';
 import { snackbarActions } from '../../store/snackbarSlice';
+import useAxios from '../../hooks/useAxios';
 
 const TodoPage = () => {
 
@@ -48,6 +48,7 @@ const TodoPage = () => {
     const [todoItemList, setTodoItemList, addTodoItem, updateTodoItem, deleteTodoItem] = useTodoItemList();
     const { control, handleSubmit, formState: { errors }, reset } = useForm();
     const dispatch = useDispatch();
+    const sendRequest = useAxios();
     // Index value for newly added item
     let newItemIndex = todoItemList.length;
 
@@ -59,25 +60,27 @@ const TodoPage = () => {
     };
 
     const fetchLatestItem = () => {
-        axios.get(
-            '/api/todo'
-        ).then(r => {
+        let successHandler = (response) => {
             /**
-             *   The index field here is to locate the absolute position
-             * of each item regarding to the entire item list. With this
-             * index we can easily manipulate the state object for item
-             * list when we edit/delete/display it.
-             * 
+              *   The index field here is to locate the absolute position
+              * of each item regarding to the entire item list. With this
+              * index we can easily manipulate the state object for item
+              * list when we edit/delete/display it.
+              * 
              **/
-            let itemList = r.data.map((item, index) => ({...item, index}));
+            let itemList = response.data.map((item, index) => ({...item, index}));
             setTodoItemList(itemList);
-        }).catch(
-            e => dispatch(snackbarActions.showMessage({
-                message: e.response.data + '\n' + e.response.statusText,
-                title: 'Error occurs when fetching todo item list',
-                alertSeverity: 'error'
-            }))
-        );
+        };
+        let errorHandler = (error) => dispatch(snackbarActions.showMessage({
+            message: error.response.data + '; ' + error.response.statusText,
+            title: 'Error occurs when fetching todo item list',
+            alertSeverity: 'error'
+        }));
+
+        sendRequest({
+            url: '/api/todo',
+            method: 'get'
+        }, successHandler, errorHandler);
     };
 
     // Simplified function for handling favoured/checked status
@@ -90,19 +93,21 @@ const TodoPage = () => {
             ...todoItemList[index],
             [statusType]: updatedValue
         };
-        axios.post(
-            "/api/todo/update",
-            updatedItem
-        ).then(r => {
-            console.log('Changed item status', r.data);
+        let successHandler = (response) => {
+            console.log('Changed item status', response.data);
             updateTodoItem(updatedItem);
-        }).catch(
-            e => dispatch(snackbarActions.showMessage({
-                message: e.response.data + '\n' + e.response.statusText,
-                title: "Failed to update the item's status!",
-                alertSeverity: 'error'
-            }))
-        );
+        };
+        let errorHandler = (error) => dispatch(snackbarActions.showMessage({
+            message: error.response.data + '; ' + error.response.statusText,
+            title: "Failed to update the item's status!",
+            alertSeverity: 'error'
+        }));
+
+        sendRequest({
+            url: '/api/todo/update',
+            method: 'post',
+            data: updatedItem
+        }, successHandler, errorHandler);
     };
 
     const createItem = () => {
@@ -120,23 +125,25 @@ const TodoPage = () => {
     };
 
     const deleteItem = (index) => {
-        axios.delete(
-            `/api/todo/${todoItemList[index].id}`
-        ).then(r => {
-            console.log('deleted item', r.data);
+        let successHandler = (response) => {
+            console.log('deleted item', response.data);
             dispatch(snackbarActions.showMessage({
                 title: 'Success!',
                 message: 'Deleted the item successfully',
                 alertSeverity: 'success'
             }));
             deleteTodoItem(index);
-        }).catch(
-            e => dispatch(snackbarActions.showMessage({
-                title: 'Fail to delete the item!',
-                message: e.response.data + '\n' + e.response.statusText,
-                alertSeverity: 'error'
-            }))
-        );
+        };
+        let errorHandler = (error) => dispatch(snackbarActions.showMessage({
+            title: 'Fail to delete the item!',
+            message: error.response.data + '; ' + error.response.statusText,
+            alertSeverity: 'error'
+        }));
+
+        sendRequest({
+            url: `/api/todo/${todoItemList[index].id}`,
+            method: 'delete',
+        }, successHandler, errorHandler)
     };
 
     const closeItemEditDialog = () => {
@@ -153,59 +160,43 @@ const TodoPage = () => {
      */
     const submitItemData = data => {
         let index = itemEditDialogState.itemIndex;
-        if(index < 0){
-            // We are adding a new todo item
-            let newItem = {
-                isChecked: false,
-                isFavoured: false,
-                id: Date.now(),
-                index: newItemIndex,
-                ...data
-            };
-            axios.post(
-                '/api/todo/new',
-                newItem
-            ).then(r => {
-                console.log('added item', r.data);
-                addTodoItem(newItem);
-                dispatch(snackbarActions.showMessage({
-                    title: 'Success!',
-                    message: 'Added the new item',
-                    alertSeverity: 'success'
-                }));
-            }).catch(
-                e => dispatch(snackbarActions.showMessage({
-                    title: 'Fail to add the new item!',
-                    message: e.response.data + '\n' + e.response.statusText,
-                    alertSeverity: 'error'
-                }))
-            );
-        }else{
-            // We are updating an existed todo item
-            let updatedItem = {
-                ...todoItemList[index],
-                ...data
-            }
-            axios.post(
-                '/api/todo/update',
-                updatedItem
-            ).then(r => {
-                console.log('updated item', r.data);
-                updateTodoItem(updatedItem);
-                dispatch(snackbarActions.showMessage({
-                    title: 'Success!',
-                    message: 'Update successfully',
-                    alertSeverity: 'success'
-                }));
-            }).catch(
-                e => dispatch(snackbarActions.showMessage({
-                    title: 'Fail to update the item!',
-                    message: e.response.data + '\n' + e.response.statusText,
-                    alertSeverity: 'error'
-                }))
-            );
+        // Create a flag variable to avoid duplicate codes.
+        let flag = index >= 0;
+        /**
+         *   Instead using if-else to handle two different situations
+         * with duplicate codes, I created this baseItem to handle each
+         * situation based on the index value. If we are editting an existed
+         * item (index >= 0), the base item will be overwriten by the item
+         * we are editing.
+         */
+        let baseItem = {
+            isChecked: false,
+            isFavoured: false,
+            id: Date.now(),
+            index: newItemIndex,
+            ...(flag && todoItemList[index]),
+            ...data
         }
-        closeItemEditDialog();
+        let successHandler = (response) => {
+            console.log(`${flag ? 'Updated' : 'Added'} item`, response.data);
+            flag ? updateTodoItem(baseItem) : addTodoItem(baseItem);
+            dispatch(snackbarActions.showMessage({
+                title: 'Success!',
+                message: `${flag ? 'Updated' : 'Added'} the item successfully`,
+                alertSeverity: 'success'
+            }));
+        };
+        let errorHandler = (error) => dispatch(snackbarActions.showMessage({
+            title: `Failed to ${flag ? 'Updated' : 'Added'} the item!`,
+            message: error.response.data + '; ' + error.response.statusText,
+            alertSeverity: 'error'
+        }));
+
+        sendRequest({
+            url: `/api/todo/${flag ? 'update' : 'new'}`,
+            method: 'post',
+            data: baseItem
+        }, successHandler, errorHandler).finally(closeItemEditDialog);
     };
 
     const clearSearch = () => {
