@@ -23,7 +23,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import EventIcon from '@mui/icons-material/Event';
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../store/authSlice';
 import { snackbarActions } from '../../store/snackbarSlice';
@@ -35,6 +35,7 @@ const MainNavBar = (props) => {
     const isLogged = useSelector(state => state.auth.isLogged);
     const sendRequest = useAxios();
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const menuItemObj = {
         'Home': [<HomeIcon />, '/home'],
@@ -162,7 +163,7 @@ const MainNavBar = (props) => {
                             padding: '8px 0',
                             whiteSpace: 'nowrap'
                         }}>
-                            <ListItemButton selected={index === selectedItemIndex}
+                            <ListItemButton selected={menuItemObj[label][1] === location.pathname}
                                 onClick={()=>onMenuItemSelectHandler(index)}
                             >
                                 <ListItemIcon>

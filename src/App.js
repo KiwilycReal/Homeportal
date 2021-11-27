@@ -4,7 +4,7 @@ import './App.css';
 import Grid from '@mui/material/Grid';
 
 import { useState } from 'react';
-import { Route, Switch, Redirect} from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
@@ -17,6 +17,7 @@ import TodoPage from './pages/TodoPage/TodoPage';
 import AuthenticationDialog from './components/AuthenticationDialog/AuthenticationDialog';
 import { useDispatch, useSelector } from 'react-redux';
 import { snackbarActions } from './store/snackbarSlice';
+import DenyPage from './pages/DenyPage/DenyPage';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
   const closedDrawerWidth = '56px';
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const [isAuthDialogOpened, setIsAuthDialogOpened] = useState(false);
+  const isLogged = useSelector(state => state.auth.isLogged);
   const snackbarState = useSelector(state => state.snackbar);
   const dispatch = useDispatch();
 
@@ -60,7 +62,7 @@ function App() {
                 <HomePage />
             </Route>
             <Route path="/todo">
-                <TodoPage />
+                {isLogged ? <TodoPage /> : <DenyPage />}
             </Route>
             <Route path="/">
                 <Redirect to="/home" />

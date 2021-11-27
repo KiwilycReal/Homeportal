@@ -17,7 +17,7 @@ import { snackbarActions } from '../../store/snackbarSlice';
 const AuthenticationDialog = (props) => {
 
     const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm();
-    const [ isLogin, setIsLogin ] = useState(false);
+    const [ isLogin, setIsLogin ] = useState(true);
     const [ isPasswordVisible, setIsPasswordVisible ] = useState(false);
     const [ isLoading, setIsLoading ] = useState(false);
     const dispatch = useDispatch();
