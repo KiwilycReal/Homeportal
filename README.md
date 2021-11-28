@@ -1,6 +1,9 @@
 # Homeportal
 ## Try to build a one-stop smart home portal includes:
-- [ ] User authentication
+- [x] User authentication
+- [x] Todo list
+- [ ] Family calendar
+- [ ] Family events chronology
 - [ ] Family gallery
 - [ ] Account book
 - [ ] Shared netdisk
