@@ -49,7 +49,7 @@ function App() {
         alignItems='flex-start'
         sx={{
             width: `calc(100% - ${isDrawerOpened ? openedDrawerWidth : closedDrawerWidth})`,
-            height: '1000px',
+            height: theme => `calc(${window.innerHeight}px - ${theme.mixins.toolbar["@media (min-width:600px)"].minHeight}px - 32px)`,
             padding: '16px',
             zIndex: theme => theme.zIndex.drawer + 1,
             marginTop: theme => theme.mixins.toolbar["@media (min-width:600px)"].minHeight + 'px',
